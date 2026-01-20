@@ -124,27 +124,18 @@ if camera_on:
 
                 current_time = time.time()
 
-                # Initialize once (outside the loop)
-if "label_count" not in st.session_state:
-    st.session_state.label_count = 0
-    st.session_state.prev_label = None
-
-# Inside your prediction loop
-if confidence >= 0.80:
-    if label == st.session_state.prev_label:
-        st.session_state.label_count += 1
-    else:
-        st.session_state.label_count = 1
-        st.session_state.prev_label = label
-
-    if st.session_state.label_count == 10:
-        print(label)                      # or st.session_state.word += label
-        st.session_state.label_count = 0  # reset to avoid repeated printing
-
+                if confidence >= 0.90:
+                    if (
+                        label != last_added_label
+                        and (current_time - last_added_time) > ADD_DELAY
+                    ):
+                        st.session_state.word += label
+                        last_added_label = label
+                        last_added_time = current_time
 
 
         frame_window.image(frame, channels="BGR")
-        # word_placeholder.markdown(f"### Word: **{st.session_state.word}**")
+        word_placeholder.markdown(f"### Word: **{st.session_state.word}**")
 
     cap.release()
 else:
